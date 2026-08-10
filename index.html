@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Tree 2026–2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e14;
+    --panel:#10151f;
+    --panel-border:#1d2633;
+    --cyan:#00f0ff;
+    --magenta:#ff2ec4;
+    --amber:#ffb020;
+    --danger:#ff3b3b;
+    --text:#dbe4f0;
+    --muted:#5f7186;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(0,240,255,0.07), transparent 45%),
+      radial-gradient(circle at 85% 10%, rgba(255,46,196,0.06), transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    padding:24px 16px 60px;
+    min-height:100vh;
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+
+  header{margin-bottom:22px;}
+  .eyebrow{
+    font-size:11px;letter-spacing:.2em;color:var(--cyan);text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:clamp(24px,5vw,34px);
+    margin:0 0 4px;
+    letter-spacing:-0.01em;
+    background:linear-gradient(90deg,var(--cyan),var(--magenta));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .sub{color:var(--muted);font-size:13px;}
+
+  /* Punishment meter — the signature element */
+  .meter-card{
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:10px;
+    padding:16px 18px;
+    margin:18px 0 26px;
+    position:relative;
+    overflow:hidden;
+  }
+  .meter-top{
+    display:flex;justify-content:space-between;align-items:baseline;
+    margin-bottom:10px;flex-wrap:wrap;gap:6px;
+  }
+  .meter-label{font-size:11px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;}
+  .meter-count{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--text);}
+  .meter-count span{color:var(--cyan);}
+  .meter-bar-track{
+    height:10px;background:#060a10;border-radius:6px;overflow:hidden;
+    border:1px solid var(--panel-border);position:relative;
+  }
+  .meter-bar-fill{
+    height:100%;border-radius:6px;
+    background:linear-gradient(90deg,var(--magenta),var(--cyan));
+    transition:width .4s ease;
+  }
+  .meter-threshold{
+    position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--amber);
+  }
+  .meter-threshold::after{
+    content:'10/20';
+    position:absolute;top:-18px;left:50%;transform:translateX(-50%);
+    font-size:10px;color:var(--amber);white-space:nowrap;
+  }
+  .meter-verdict{
+    margin-top:12px;font-size:12px;line-height:1.5;
+  }
+  .verdict-safe{color:#4ee89a;}
+  .verdict-danger{color:var(--danger);}
+  .penalty-line{color:var(--muted);font-size:11px;margin-top:4px;}
+
+  .tag-filter{
+    display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;
+  }
+  .tag-btn{
+    background:var(--panel);border:1px solid var(--panel-border);color:var(--muted);
+    font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 10px;border-radius:20px;
+    cursor:pointer;transition:.15s;
+  }
+  .tag-btn.active{border-color:var(--cyan);color:var(--cyan);}
+
+  .grid{
+    display:grid;grid-template-columns:1fr;gap:10px;
+  }
+  @media(min-width:640px){.grid{grid-template-columns:1fr 1fr;}}
+
+  .card{
+    background:var(--panel);border:1px solid var(--panel-border);border-radius:10px;
+    padding:13px 14px;position:relative;transition:border-color .2s;
+  }
+  .card.done{border-color:rgba(78,232,154,.4);}
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .card-id{font-size:10px;color:var(--muted);}
+  .card-title{
+    font-family:'Space Grotesk',sans-serif;font-size:14.5px;font-weight:600;
+    margin:2px 0 6px;color:var(--text);line-height:1.3;
+  }
+  .card.done .card-title{color:#4ee89a;}
+  .card-tag{
+    display:inline-block;font-size:9px;letter-spacing:.08em;color:var(--muted);
+    border:1px solid var(--panel-border);border-radius:4px;padding:1px 6px;margin-bottom:8px;
+  }
+  .row{display:flex;align-items:center;gap:8px;}
+
+  /* checkbox toggle */
+  .toggle{
+    width:20px;height:20px;border-radius:5px;border:1.5px solid var(--panel-border);
+    background:#060a10;cursor:pointer;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;transition:.15s;
+  }
+  .toggle.checked{background:linear-gradient(135deg,var(--cyan),var(--magenta));border-color:transparent;}
+  .toggle.checked::after{content:'✓';font-size:12px;color:#0a0e14;font-weight:700;}
+
+  /* numeric stepper */
+  .num-controls{display:flex;align-items:center;gap:8px;margin-top:2px;}
+  .stepper{
+    display:flex;align-items:center;gap:6px;background:#060a10;border:1px solid var(--panel-border);
+    border-radius:6px;padding:2px 4px;
+  }
+  .stepper button{
+    background:none;border:none;color:var(--cyan);font-size:14px;width:22px;height:22px;
+    cursor:pointer;border-radius:4px;
+  }
+  .stepper button:hover{background:rgba(0,240,255,.1);}
+  .stepper .val{font-size:12px;min-width:64px;text-align:center;color:var(--text);}
+  .mini-bar-track{flex:1;height:5px;background:#060a10;border-radius:3px;overflow:hidden;}
+  .mini-bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--magenta));}
+
+  footer{
+    text-align:center;color:var(--muted);font-size:11px;margin-top:30px;
+  }
+
+  .reset-btn{
+    display:block;margin:24px auto 0;background:none;border:1px solid var(--panel-border);
+    color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;
+    padding:6px 14px;border-radius:6px;cursor:pointer;
+  }
+  .reset-btn:hover{border-color:var(--danger);color:var(--danger);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">NeonGD1667 // Homeless Team</div>
+    <h1>Skill Tree 2026–2027</h1>
+    <div class="sub">20 mục tiêu. Luật chơi: dưới 10/20 → tự code 1 tỷ dòng.</div>
+  </header>
+
+  <div class="meter-card">
+    <div class="meter-top">
+      <div class="meter-label">Progress toward survival</div>
+      <div class="meter-count"><span id="doneCount">0</span>/20 hoàn thành</div>
+    </div>
+    <div class="meter-bar-track">
+      <div class="meter-bar-fill" id="meterFill" style="width:0%"></div>
+      <div class="meter-threshold" style="left:50%"></div>
+    </div>
+    <div class="meter-verdict" id="meterVerdict"></div>
+    <div class="penalty-line">Hình phạt nếu &lt;10/20: 1.000.000.000 dòng code, tự tay gõ.</div>
+  </div>
+
+  <div class="tag-filter" id="tagFilter"></div>
+
+  <div class="grid" id="grid"></div>
+
+  <button class="reset-btn" id="resetBtn">reset toàn bộ progress</button>
+  <footer>lưu tự động — mở lại vẫn còn nguyên tiến độ</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'goals-2026-2027';
+
+const GOALS = [
+  {id:1, title:'Học sinh giỏi', tag:'DEPENDENCY', type:'check'},
+  {id:2, title:'Biết 7 ngôn ngữ lập trình', tag:'DEPENDENCY', type:'count', target:7, unit:'ngôn ngữ'},
+  {id:3, title:'Tidal Wave — OnilinkGD', tag:'PROGRESS', type:'check', note:'chỉ cần có progress'},
+  {id:4, title:'Ít nhất 1 level được Rate', tag:'SOLO+', type:'check'},
+  {id:5, title:'10.000 Stars', tag:'GRIND', type:'count', target:10000, step:100, unit:'stars'},
+  {id:6, title:'365 Daily', tag:'STREAK', type:'count', target:365, unit:'ngày'},
+  {id:7, title:'1 Geode mod tự code', tag:'BUILD', type:'check'},
+  {id:8, title:'Giảm cân / cải thiện thể lực', tag:'BODY', type:'check'},
+  {id:9, title:'SECRET TASK — cua em Hân', tag:'???', type:'check'},
+  {id:10, title:'Laptop mới', tag:'SOON™', type:'check'},
+  {id:11, title:'Có tài khoản ngân hàng', tag:'LATER', type:'check'},
+  {id:12, title:'Đỗ lớp 10', tag:'MAIN QUEST', type:'check'},
+  {id:13, title:'Sửa màn hình điện thoại', tag:'ALMOST', type:'count', target:100, step:5, unit:'%', startVal:90},
+  {id:14, title:'500 Demons', tag:'GRIND', type:'count', target:500, step:5, unit:'demons', startVal:100},
+  {id:15, title:'Học làm nhạc (bỏ Suno AI)', tag:'CREATIVE', type:'check'},
+  {id:16, title:'Kiếm tiền từ Spotify', tag:'NAH', type:'check'},
+  {id:17, title:'Đai vàng Vovinam', tag:'BODY', type:'check'},
+  {id:18, title:'Giảm mụn', tag:'BODY', type:'check'},
+  {id:19, title:'Cao hơn', tag:'BODY', type:'check'},
+  {id:20, title:'Biết Art (GD Art + Real Art)', tag:'CREATIVE', type:'check'},
+];
+
+let state = {};
+
+function defaultState(){
+  const s = {};
+  GOALS.forEach(g=>{
+    if(g.type==='check') s[g.id] = {done:false};
+    else s[g.id] = {current: g.startVal||0};
+  });
+  return s;
+}
+
+async function load(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY);
+    state = res && res.value ? JSON.parse(res.value) : defaultState();
+  }catch(e){
+    state = defaultState();
+  }
+  // backfill any missing goal entries
+  GOALS.forEach(g=>{
+    if(!state[g.id]) state[g.id] = g.type==='check' ? {done:false} : {current:g.startVal||0};
+  });
+  render();
+}
+
+async function save(){
+  try{
+    await window.storage.set(STORAGE_KEY, JSON.stringify(state));
+  }catch(e){
+    console.error('save failed', e);
+  }
+}
+
+function isGoalDone(g){
+  if(g.type==='check') return !!state[g.id].done;
+  return state[g.id].current >= g.target;
+}
+
+function toggleCheck(id){
+  state[id].done = !state[id].done;
+  save(); render();
+}
+
+function stepCount(id, delta){
+  const g = GOALS.find(x=>x.id===id);
+  let v = state[id].current + delta;
+  v = Math.max(0, Math.min(g.target, v));
+  state[id].current = v;
+  save(); render();
+}
+
+let activeTag = 'ALL';
+
+function renderTags(){
+  const tags = ['ALL', ...new Set(GOALS.map(g=>g.tag))];
+  const el = document.getElementById('tagFilter');
+  el.innerHTML = '';
+  tags.forEach(t=>{
+    const btn = document.createElement('button');
+    btn.className = 'tag-btn' + (t===activeTag ? ' active' : '');
+    btn.textContent = t;
+    btn.onclick = ()=>{activeTag = t; render();};
+    el.appendChild(btn);
+  });
+}
+
+function render(){
+  renderTags();
+  const doneCount = GOALS.filter(isGoalDone).length;
+  document.getElementById('doneCount').textContent = doneCount;
+  document.getElementById('meterFill').style.width = (doneCount/20*100)+'%';
+
+  const verdictEl = document.getElementById('meterVerdict');
+  if(doneCount >= 10){
+    verdictEl.className = 'meter-verdict verdict-safe';
+    verdictEl.textContent = `An toàn — đã qua mốc 10. Còn ${20-doneCount} mục tiêu nữa để full clear.`;
+  } else {
+    verdictEl.className = 'meter-verdict verdict-danger';
+    verdictEl.textContent = `Còn thiếu ${10-doneCount} mục tiêu nữa mới thoát án phạt.`;
+  }
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  const filtered = activeTag==='ALL' ? GOALS : GOALS.filter(g=>g.tag===activeTag);
+
+  filtered.forEach(g=>{
+    const done = isGoalDone(g);
+    const card = document.createElement('div');
+    card.className = 'card' + (done ? ' done' : '');
+
+    if(g.type==='check'){
+      card.innerHTML = `
+        <div class="card-top">
+          <div>
+            <div class="card-id">#${String(g.id).padStart(2,'0')}</div>
+            <div class="card-title">${g.title}</div>
+          </div>
+          <div class="toggle ${done?'checked':''}" data-id="${g.id}"></div>
+        </div>
+        <div class="card-tag">${g.tag}</div>
+      `;
+      card.querySelector('.toggle').onclick = ()=>toggleCheck(g.id);
+    } else {
+      const cur = state[g.id].current;
+      const pct = Math.min(100, (cur/g.target*100));
+      card.innerHTML = `
+        <div class="card-top">
+          <div>
+            <div class="card-id">#${String(g.id).padStart(2,'0')}</div>
+            <div class="card-title">${g.title}</div>
+          </div>
+        </div>
+        <div class="card-tag">${g.tag}</div>
+        <div class="row" style="margin-bottom:6px;">
+          <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="num-controls">
+          <div class="stepper">
+            <button data-act="minus" data-id="${g.id}">−</button>
+            <div class="val">${cur}/${g.target}${g.unit?(' '+g.unit):''}</div>
+            <button data-act="plus" data-id="${g.id}">+</button>
+          </div>
+        </div>
+      `;
+      const step = g.step || 1;
+      card.querySelector('[data-act="minus"]').onclick = ()=>stepCount(g.id, -step);
+      card.querySelector('[data-act="plus"]').onclick = ()=>stepCount(g.id, step);
+    }
+    grid.appendChild(card);
+  });
+}
+
+document.getElementById('resetBtn').onclick = async ()=>{
+  if(confirm('Reset toàn bộ progress về 0? Không hoàn tác được.')){
+    state = defaultState();
+    await save();
+    render();
+  }
+};
+
+load();
+</script>
+</body>
+</html>
